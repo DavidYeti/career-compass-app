@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Career Compass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for social media icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chosen Palette: Dynamic Professional (Teal, Orange, and Purple Accents) -->
+    <!-- Application Structure Plan: The application is designed as a single-page, stepped interactive guide. A persistent top navigation bar and a central interactive flowchart allow users to move between the six core steps of the career reverse-engineering process. This structure was chosen to break down a complex process into manageable, focused stages, enhancing user comprehension and providing a clear sense of progress. Instead of a linear scroll, this interactive model encourages both sequential learning and non-linear exploration, empowering the user to navigate the content at your own pace. The dynamic content display, powered by JavaScript, ensures the interface remains clean and uncluttered, focusing the user's attention on one step at a time. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: The 6-step career planning process. -> Goal: Organize & Guide. -> Viz/Method: An interactive flowchart built with HTML/Tailwind CSS. -> Interaction: Clicking a step in the flowchart or top navigation reveals the corresponding content section. -> Justification: This visually represents the entire process, serving as a mental map for the user and making navigation intuitive.
+        - Report Info: Key actions for each step. -> Goal: Emphasize & Inform. -> Viz/Method: Content is presented in styled "cards" with distinct backgrounds and icons. -> Interaction: Static display within each step's view. -> Justification: This format visually isolates the most critical, actionable takeaways, making them easy to identify and remember.
+        - Library/Method: All interactivity is handled with Vanilla JavaScript for DOM manipulation. No chart libraries are needed as the source data is qualitative.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9FAFB; /* Light Gray */
+            color: #1F2937; /* Dark Gray */
+        }
+        .nav-item {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-item.active {
+            border-bottom-color: #06B6D4; /* Cyan-500 (Vibrant Teal) */
+            color: #111827; /* Near Black */
+        }
+        .step-node {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid #D1D5DB; /* Light Gray Border */
+        }
+        .step-node.active {
+            border-color: #06B6D4; /* Cyan-500 (Vibrant Teal) */
+            background-color: #E0F7FA; /* Cyan-50 (Light Teal) */
+            transform: scale(1.05);
+        }
+        .step-node:not(.active):hover {
+            background-color: #E0F7FA; /* Cyan-50 */
+            border-color: #9CA3AF; /* Medium Gray */
+        }
+        .step-arrow {
+            color: #9CA3AF; /* Medium Gray */
+            font-size: 2rem;
+            line-height: 1;
+        }
+        .content-panel {
+            display: none;
+        }
+        .content-panel.active {
+            display: block;
+        }
+        .action-card {
+            background-color: #FDF2F8; /* Pink-50 (Soft Pink) */
+            border-left: 4px solid #DB2777; /* Pink-600 (Vibrant Pink/Magenta) */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <header class="text-center mb-10 md:mb-16">
+            <div class="text-5xl mb-4 text-cyan-600">🧭</div>
+            <h1 class="text-3xl md:text-5xl font-bold text-gray-800 mb-2">Your Career Compass</h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">A step-by-step guide to reverse engineer any career you desire.</p>
+        </header>
+
+        <nav class="w-full mb-10 md:mb-16 hidden md:block">
+            <div id="top-nav" class="flex justify-center items-center border-b border-gray-200">
+                <a href="#" class="nav-item text-gray-500 font-medium py-4 px-6" data-step="0">Step 1: Define</a>
+                <a href="#" class="nav-item text-gray-500 font-medium py-4 px-6" data-step="1">Step 2: Research</a>
+                <a href="#" class="nav-item text-gray-500 font-medium py-4 px-6" data-step="2">Step 3: Deconstruct</a>
+                <a href="#" class="nav-item text-gray-500 font-medium py-4 px-6" data-step="3">Step 4: Analyze Gaps</a>
+                <a href="#" class="nav-item text-gray-500 font-medium py-4 px-6" data-step="4">Step 5: Build Blueprint</a>
+                <a href="#" class="nav-item text-gray-500 font-medium py-4 px-6" data-step="5">Step 6: Execute</a>
+            </div>
+        </nav>
+
+        <section id="interactive-flow" class="mb-12">
+            <div class="text-center mb-6">
+                 <h2 class="text-2xl font-semibold text-gray-700">The 6-Step Process</h2>
+                 <p class="text-gray-500 mt-1">Click on any step to explore its details.</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 items-center gap-y-4 gap-x-2 md:gap-x-4">
+                <div class="step-node flex flex-col items-center justify-center p-4 h-32 md:h-36 rounded-lg text-center" data-step="0">
+                    <div class="text-3xl mb-2 text-cyan-500">🎯</div>
+                    <span class="font-semibold text-sm md:text-base">Define Target</span>
+                </div>
+                <div class="step-node flex flex-col items-center justify-center p-4 h-32 md:h-36 rounded-lg text-center" data-step="1">
+                    <div class="text-3xl mb-2 text-cyan-500">🔍</div>
+                    <span class="font-semibold text-sm md:text-base">Research End-Goal</span>
+                </div>
+                <div class="step-node flex flex-col items-center justify-center p-4 h-32 md:h-36 rounded-lg text-center" data-step="2">
+                    <div class="text-3xl mb-2 text-cyan-500">🗺️</div>
+                    <span class="font-semibold text-sm md:text-base">Deconstruct Path</span>
+                </div>
+                <div class="step-node flex flex-col items-center justify-center p-4 h-32 md:h-36 rounded-lg text-center" data-step="3">
+                    <div class="text-3xl mb-2 text-cyan-500">📊</div>
+                    <span class="font-semibold text-sm md:text-base">Analyze Skill Gaps</span>
+                </div>
+                <div class="step-node flex flex-col items-center justify-center p-4 h-32 md:h-36 rounded-lg text-center" data-step="4">
+                    <div class="text-3xl mb-2 text-cyan-500">📝</div>
+                    <span class="font-semibold text-sm md:text-base">Build Blueprint</span>
+                </div>
+                <div class="step-node flex flex-col items-center justify-center p-4 h-32 md:h-36 rounded-lg text-center" data-step="5">
+                    <div class="text-3xl mb-2 text-cyan-500">🚀</div>
+                    <span class="font-semibold text-sm md:text-base">Execute & Iterate</span>
+                </div>
+            </div>
+        </section>
+
+        <main id="content-container" class="bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-200 min-h-[30rem]">
+            <!-- Step 1 Content -->
+            <div id="step-0" class="content-panel">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Step 1: Define Your Target Career (The "End Product")</h3>
+                <p class="text-gray-600 mb-6">This first step is the foundation of your entire plan. It involves moving from a vague idea to a highly specific, well-defined career goal. The more detail you can add here, the easier it will be to build a direct path to achieving it. Think of this as setting the coordinates for your GPS before you start driving.</p>
+                <ul class="space-y-4 mb-8">
+                    <li><strong class="font-semibold text-gray-700">Specific Role & Industry:</strong> Go beyond "tech" or "healthcare." Pinpoint a title like "Senior Product Manager" and an industry sector like "B2B SaaS for AI solutions."</li>
+                    <li><strong class="font-semibold text-gray-700">Company Type/Culture:</strong> Do you thrive in a chaotic startup environment or a structured corporate one? Define your ideal workplace.</li>
+                    <li><strong class="font-semibold text-gray-700">Day-to-Day Responsibilities:</b> Imagine your perfect work week. What specific tasks are you performing? Who are you collaborating with?</li>
+                    <li><strong class="font-semibold text-gray-700">Impact & Values:</strong> What change do you want to create? What personal values must your work align with?</li>
+                </ul>
+                <div class="action-card p-4 rounded-lg">
+                    <h4 class="font-bold text-gray-900 mb-2">Action Item:</h4>
+                    <p class="text-gray-700">Write a detailed, one-page description of your ideal career. Treat it as a job description for a role that's perfectly tailored to you.</p>
+                </div>
+            </div>
+
+            <!-- Step 2 Content -->
+            <div id="step-1" class="content-panel">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Step 2: Research the "End Product" (Disassemble the Machine)</h3>
+                <p class="text-gray-600 mb-6">With a clear target in mind, your next task is to become an expert on what it *actually* takes to get there. This investigative phase involves gathering real-world data to understand the skills, experience, and qualifications required for your chosen role. You are essentially creating a checklist of requirements.</p>
+                <ul class="space-y-4 mb-8">
+                    <li><strong class="font-semibold text-gray-700">Analyze Job Descriptions:</strong> Scour job boards for 5-10 postings for your target role. Note the common keywords, required skills (hard and soft), and years of experience.</li>
+                    <li><strong class="font-semibold text-gray-700">Leverage LinkedIn:</strong> Find people who currently hold your dream job. Study their career trajectories—what were their previous roles? What skills do they highlight?</li>
+                    <li><strong class="font-semibold text-gray-700">Conduct Informational Interviews:</b> Reach out to professionals in the field. Ask about their journey, the most critical skills for success, and the advice they'd give to an aspiring individual.</li>
+                    <li><strong class="font-semibold text-gray-700">Industry Research:</strong> Read trade publications and blogs to understand the current trends, challenges, and opportunities shaping your target industry.</li>
+                </ul>
+                <div class="action-card p-4 rounded-lg">
+                    <h4 class="font-bold text-gray-900 mb-2">Action Item:</h4>
+                    <p class="text-gray-700">Compile a master list of all the required skills, experiences, and qualifications you've uncovered during your research.</p>
+                </div>
+            </div>
+
+            <!-- Step 3 Content -->
+            <div id="step-2" class="content-panel">
+                <h3 class="2xl font-bold text-gray-800 mb-4">Step 3: Deconstruct the Path (Understand the Components)</h3>
+                <p class="text-gray-600 mb-6">Careers are rarely a single leap; they are a series of stepping stones. This step is about identifying those intermediate milestones and understanding the logical progression. By mapping out the typical journey, you can plan your own route, whether it's conventional or unique.</p>
+                 <ul class="space-y-4 mb-8">
+                    <li><strong class="font-semibold text-gray-700">Identify Key Milestones:</strong> What are the typical entry-level and mid-level roles that lead to your target position? For example, Analyst → Senior Analyst → Manager.</li>
+                    <li><strong class="font-semibold text-gray-700">Map Out Prerequisite Skills:</strong> For each milestone, what skills or experiences are necessary? How does one role prepare you for the next?</li>
+                    <li><strong class="font-semibold text-gray-700">Consider Alternative Paths:</strong> Look for unconventional routes. Did someone pivot from a different industry? Can skills be gained through freelancing or personal projects instead of a traditional job?</li>
+                </ul>
+                <div class="action-card p-4 rounded-lg">
+                    <h4 class="font-bold text-gray-900 mb-2">Action Item:</h4>
+                    <p class="text-gray-700">Create a flowchart or timeline that illustrates one or more potential career paths from an entry-level position to your ultimate goal.</p>
+                </div>
+            </div>
+            
+            <!-- Step 4 Content -->
+            <div id="step-3" class="content-panel">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Step 4: Identify Skill Gaps (Compare Your Inventory)</h3>
+                <p class="text-gray-600 mb-6">This is a critical moment of self-reflection. Here, you'll perform an honest audit of your current profile and compare it against the ideal candidate profile you developed in Step 2. The goal is not to feel discouraged, but to create a clear, prioritized list of what you need to develop.</p>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div>
+                        <h4 class="font-semibold text-lg text-gray-800 mb-2">Self-Assessment</h4>
+                        <p class="text-gray-600">Be honest about your current skills, experience, and knowledge. What do you *already* have that aligns with the target?</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg text-gray-800 mb-2">Gap Analysis</h4>
+                        <p class="text-gray-600">List the skills, experiences, and qualifications you *lack*. Categorize them: technical, soft, industry knowledge, certifications.</p>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-6">Once you have your list of gaps, prioritize them. Which are absolute "must-haves" to get your foot in the door? Which are "nice-to-haves" that can be developed over time?</p>
+                <div class="action-card p-4 rounded-lg">
+                    <h4 class="font-bold text-gray-900 mb-2">Action Item:</h4>
+                    <p class="text-gray-700">Create two columns on a piece of paper or a document: "What I Have" and "What I Need." Fill them out based on your analysis.</p>
+                </div>
+            </div>
+
+            <!-- Step 5 Content -->
+            <div id="step-4" class="content-panel">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Step 5: Build Your "Blueprint" (Design Your Strategy)</h3>
+                <p class="text-gray-600 mb-6">Now it's time to turn your analysis into an actionable plan. This blueprint is your personal roadmap, detailing exactly how you will bridge the gaps you identified in the previous step. It should be specific, resource-driven, and time-bound.</p>
+                <ul class="space-y-4 mb-8">
+                    <li><strong class="font-semibold text-gray-700">Skill Acquisition Plan:</strong> For each missing skill, identify how you'll learn it (e.g., specific online course, book, side project).</li>
+                    <li><strong class="font-semibold text-gray-700">Experience Building Plan:</strong> How will you gain the necessary experience? (e.g., volunteer work, seeking specific projects at your current job, internships).</li>
+                    <li><strong class="font-semibold text-gray-700">Networking Strategy:</strong> Who do you need to connect with? Identify target individuals, companies, and industry events.</li>
+                    <li><strong class="font-semibold text-gray-700">Timeline & Milestones:</strong> Set realistic deadlines. Break your big goal into quarterly or monthly objectives to stay on track.</li>
+                </ul>
+                <div class="action-card p-4 rounded-lg">
+                    <h4 class="font-bold text-gray-900 mb-2">Action Item:</h4>
+                    <p class="text-gray-700">Write out a detailed action plan. For each item on your "What I Need" list, assign a specific resource, a method for learning/gaining it, and a target completion date.</p>
+                </div>
+            </div>
+
+            <!-- Step 6 Content -->
+            <div id="step-5" class="content-panel">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Step 6: Execute and Iterate (Build and Test)</h3>
+                <p class="text-gray-600 mb-6">A plan is useless without action. This final step is all about execution, learning, and adapting. Your career journey is a dynamic process, and your blueprint should be a living document that you adjust as you learn, grow, and encounter new opportunities.</p>
+                <ul class="space-y-4 mb-8">
+                    <li><strong class="font-semibold text-gray-700">Take Consistent Action:</strong> Dedicate regular time each week to working on your plan. Small, consistent efforts compound over time.</li>
+                    <li><strong class="font-semibold text-gray-700">Seek Feedback:</strong> Share your progress with mentors or peers. Ask for their input on your work and your strategy.</li>
+                    <li><strong class="font-semibold text-gray-700">Be Flexible and Adapt:</b> New technologies emerge, industries shift, and your interests may evolve. Be ready to adjust your plan based on new information.</li>
+                    <li><strong class="font-semibold text-gray-700">Track Progress:</strong> Celebrate your wins, no matter how small. Regularly review your plan to see what's working and what's not, and make adjustments.</li>
+                </ul>
+                 <div class="action-card p-4 rounded-lg">
+                    <h4 class="font-bold text-gray-900 mb-2">Action Item:</h4>
+                    <p class="text-gray-700">Schedule a recurring weekly or monthly "career check-in" on your calendar to review your progress, adjust your plan, and set goals for the next period.</p>
+                </div>
+            </div>
+
+            <div class="mt-10 flex justify-between items-center">
+                <button id="prev-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition-colors">Previous</button>
+                <div id="step-indicator" class="text-sm text-gray-500 font-medium">Step 1 of 6</div>
+                <button id="next-btn" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">Next</button>
+            </div>
+        </main>
+        
+        <footer class="text-center mt-12 text-gray-400 text-sm">
+             <p class="mb-4 text-gray-600 font-semibold">Connect with me below!</p>
+             <div class="flex justify-center space-x-4 text-3xl mb-6">
+                 <a href="https://www.davidyeti.com" target="_blank" class="text-purple-600 hover:text-purple-700 transition-colors" title="Website"><i class="fas fa-globe"></i></a>
+                 <a href="https://www.linkedin.com/in/david-yeti/" target="_blank" class="text-blue-700 hover:text-blue-800 transition-colors" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                 <a href="https://www.youtube.com/@davidyeti" target="_blank" class="text-red-600 hover:text-red-700 transition-colors" title="YouTube"><i class="fab fa-youtube"></i></a>
+                 <a href="https://tryhackme.com/p/DavidYeti" target="_blank" class="text-orange-500 hover:text-orange-600 transition-colors" title="TryHackMe"><i class="fas fa-terminal"></i></a>
+             </div>
+             <p>&copy; 2025 David Yeti, All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const steps = document.querySelectorAll('.content-panel');
+            const navItems = document.querySelectorAll('.nav-item');
+            const stepNodes = document.querySelectorAll('.step-node');
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const stepIndicator = document.getElementById('step-indicator');
+
+            let currentStep = 0;
+            const totalSteps = steps.length;
+
+            function showStep(stepIndex) {
+                currentStep = stepIndex;
+
+                steps.forEach((step, index) => {
+                    step.classList.toggle('active', index === stepIndex);
+                });
+
+                navItems.forEach((item, index) => {
+                    item.classList.toggle('active', index === stepIndex);
+                });
+
+                stepNodes.forEach((node, index) => {
+                    node.classList.toggle('active', index === stepIndex);
+                });
+
+                stepIndicator.textContent = `Step ${stepIndex + 1} of ${totalSteps}`;
+
+                prevBtn.disabled = stepIndex === 0;
+                prevBtn.classList.toggle('opacity-50', stepIndex === 0);
+                prevBtn.classList.toggle('cursor-not-allowed', stepIndex === 0);
+                
+                nextBtn.disabled = stepIndex === totalSteps - 1;
+                nextBtn.classList.toggle('opacity-50', stepIndex === totalSteps - 1);
+                nextBtn.classList.toggle('cursor-not-allowed', stepIndex === totalSteps - 1);
+            }
+
+            function navigateToStep(event) {
+                event.preventDefault();
+                const stepIndex = parseInt(event.currentTarget.dataset.step, 10);
+                if (!isNaN(stepIndex)) {
+                    showStep(stepIndex);
+                }
+            }
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', navigateToStep);
+            });
+            
+            stepNodes.forEach(node => {
+                node.addEventListener('click', navigateToStep);
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentStep < totalSteps - 1) {
+                    showStep(currentStep + 1);
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 0) {
+                    showStep(currentStep - 1);
+                }
+            });
+
+            showStep(0);
+        });
+    </script>
+</body>
+</html>
